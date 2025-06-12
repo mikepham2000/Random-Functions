@@ -77,8 +77,8 @@ function(file_path, inbreeding_threshold = 0.0625, farm, breed, output_dir = NUL
   A <- getA(ped.complete)
   
   # Get sires and dams IDs
-  sire_id <- dt_sires %>% (Code == farm, Breed == breed) %>% pull(Animal_ID)
-  dam_id <- dt_dams %>% (Code == farm, Breed == breed) %>% pull(Animal_ID)
+  sire_id <- dt_sires %>% filter(Code == farm, Breed == breed) %>% pull(Animal_ID)
+  dam_id <- dt_dams %>% filter(Code == farm, Breed == breed) %>% pull(Animal_ID)
   
   cat(sprintf("\n%d sires (Onfarm) | %d dams (Onfarm+Piglet) on farm\n", 
               length(sire_id), length(dam_id), unique(sire_id$code))
