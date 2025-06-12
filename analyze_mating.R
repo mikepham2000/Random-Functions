@@ -1,4 +1,4 @@
-function(file_path, farm_code, breed_code, 
+`analyze_mating` <– function(file_path, farm_code, breed_code, 
                                       inbreeding_threshold = 0.0625,
                                       output_dir = NULL) {
   
