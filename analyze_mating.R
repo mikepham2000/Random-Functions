@@ -88,7 +88,7 @@ function(file_path, inbreeding_threshold = 0.0625, farm, breed, output_dir = NUL
   pull(Animal_ID)
   
   cat(sprintf("\n%d sires (Onfarm) | %d dams (Onfarm+Piglet) on farm\n", 
-              length(sire_id), length(dam_id), unique(sire_id$code))
+              length(sire_id), length(dam_id), unique(sire_id$code)))
   
   if (length(sire_id) == 0 || length(dam_id) == 0) {
     stop("No sires or dams found for analysis")
