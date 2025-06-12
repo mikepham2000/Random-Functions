@@ -1,7 +1,5 @@
 `analyze_mating` <-
-function(file_path, farm_code, breed_code, 
-                                      inbreeding_threshold = 0.0625,
-                                      output_dir = NULL) {
+function(file_path, inbreeding_threshold = 0.0625, farm, breed, output_dir = NULL) {
   
   # Set output directory
   if (is.null(output_dir)) {
@@ -42,35 +40,26 @@ function(file_path, farm_code, breed_code,
   cat("\nAvailable breeds:\n")
   print(table(dt$Breed))
   
-  # Filter for specific farm and breed
   # For pedigree construction, use all animals; for mating, apply status filters
-  dt_pedigree <- dt %>%
-    filter(Code == farm_code, 
-           Breed == breed_code)
+  dt_pedigree <- dt
   
   dt_sires <- dt %>%
-    filter(Code == farm_code, 
-           Breed == breed_code,
-           Sex == "1",
+    filter(Sex == "1",
            Status == "Onfarm")  # Only Onfarm sires
   
   dt_dams <- dt %>%
-    filter(Code == farm_code, 
-           Breed == breed_code,
-           Sex == "2",
+    filter(Sex == "2",
            Status %in% c("Onfarm", "Piglet"))  # Onfarm and Piglet dams
   
   if (nrow(dt_sires) == 0 || nrow(dt_dams) == 0) {
     stop("No sires or dams found for analysis")
   }
-  
-  cat(sprintf("\nAnalyzing farm %s, breed %s\n", farm_code, breed_code))
-  cat(sprintf("Total animals for pedigree: %d\n", nrow(dt_pedigree)))
+  cat(sprintf("Total animals in pedigree: %d\n", nrow(dt_pedigree)))
   cat(sprintf("Sires (Onfarm only): %d\n", nrow(dt_sires)))
   cat(sprintf("Dams (Onfarm + Piglet): %d\n", nrow(dt_dams)))
   
   # Create and edit pedigree using all animals
-  cat("\nCreating pedigree structure...\n")
+  cat("\nCreating pedigree...\n")
   ped <- editPed(sire = dt_pedigree$Sire,
                  dam = dt_pedigree$Dam,
                  label = dt_pedigree$Animal_ID)
@@ -88,11 +77,11 @@ function(file_path, farm_code, breed_code,
   A <- getA(ped.complete)
   
   # Get sires and dams IDs
-  sire_id <- dt_sires %>% pull(Animal_ID)
-  dam_id <- dt_dams %>% pull(Animal_ID)
+  sire_id <- dt_sires %>% (Code == farm, Breed == breed) %>% pull(Animal_ID)
+  dam_id <- dt_dams %>% (Code == farm, Breed == breed) %>% pull(Animal_ID)
   
   cat(sprintf("\n%d sires (Onfarm) | %d dams (Onfarm+Piglet) on farm\n", 
-              length(sire_id), length(dam_id)))
+              length(sire_id), length(dam_id), unique(sire_id$code))
   
   if (length(sire_id) == 0 || length(dam_id) == 0) {
     stop("No sires or dams found for analysis")
